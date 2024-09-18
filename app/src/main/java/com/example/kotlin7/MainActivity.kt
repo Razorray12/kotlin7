@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,11 +23,11 @@ import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var editTextUrl: EditText
-    private lateinit var buttonDownload: Button
-    private lateinit var imageView: ImageView
+    lateinit var editTextUrl: EditText
+    lateinit var buttonDownload: Button
+    lateinit var imageView: ImageView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -40,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun downloadAndSaveImage(imageUrl: String, context: Context) {
+    fun downloadAndSaveImage(imageUrl: String, context: Context) {
         CoroutineScope(Dispatchers.Main).launch {
             val bitmapDeferred = downloadImage(imageUrl)
             val bitmap = bitmapDeferred.await()
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun downloadImage(imageUrl: String): Deferred<Bitmap?> {
+    fun downloadImage(imageUrl: String): Deferred<Bitmap?> {
         return CoroutineScope(Dispatchers.IO).async {
             try {
                 val url = URL(imageUrl)
@@ -69,8 +70,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveImageToDisk(bitmap: Bitmap, context: Context) {
-        CoroutineScope(Dispatchers.IO).launch {
+    fun saveImageToDisk(bitmap: Bitmap, context: Context): Job {
+        return CoroutineScope(Dispatchers.IO).async {
             try {
                 val file = File(
                     context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
@@ -83,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
                         context,
-                        "Изображение сохранено: ${file.path}",
+                        "Изображение сохранено",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
